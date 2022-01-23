@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+#cython: language_level=3
 
 import json
 from operator import itemgetter

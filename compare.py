@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+#cython: language_level=3
 
 from operator import itemgetter
 from card import make_deck, suits, values

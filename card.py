@@ -1,9 +1,22 @@
+#cython: language_level=3
 # data types
 
 suits = {'d': '\u2666','h': '\u2665', 'c': '\u2663', 's': '\u2660'}
 suits_inverse = {'\u2666': 'd', '\u2665': 'h', '\u2663': 'c', '\u2660': 's'}
 values = ('A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K')
 value_map = {'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13}
+hand_names = [
+    "royal flush",
+    "straight flush",
+    "four of a kind",
+    "full house",
+    "flush",
+    "straight",
+    "three of a kind",
+    "two pair",
+    "pair",
+    "high card"
+]
 
 # printing functions
 

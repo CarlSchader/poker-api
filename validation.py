@@ -1,3 +1,5 @@
+#cython: language_level=3
+
 # hand validation functions
 
 from card import suits, values
