@@ -1,0 +1,25 @@
+version: "3.5"
+
+services:
+  poker-api:
+    build: .
+    ports:
+      - target: 8080
+        published: 80
+    networks:
+      - poker-net
+    environment:
+      - RANK_TABLE_PATH=ranks.json
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  redis:
+    image: redis:alpine
+    ports:
+      - target: 6379
+        published: 6379
+    networks:
+      - poker-net
+
+networks:
+  poker-net:

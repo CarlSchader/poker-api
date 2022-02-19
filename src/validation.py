@@ -2,7 +2,7 @@
 
 # hand validation functions
 
-from card import suits, values
+from cards import suits, values
 
 def royal_flush(hand):
     flush_dict = {suit: set() for suit in suits}
@@ -149,15 +149,15 @@ def pair(hand):
     
     return False
 
-validators = {
-    "royal flush": royal_flush, 
-    "straight flush": straight_flush, 
-    "four of a kind": four_of_a_kind, 
-    "full house": full_house, 
-    "flush": flush, 
-    "straight": straight,
-    "three of a kind": three_of_a_kind,
-    "two pair": two_pair,
-    "pair": pair,
-    "high card": lambda x : True
-}
+validators = [
+    royal_flush,
+    straight_flush,
+    four_of_a_kind,
+    full_house,
+    flush,
+    straight,
+    three_of_a_kind,
+    two_pair,
+    pair,
+    lambda x : True
+]

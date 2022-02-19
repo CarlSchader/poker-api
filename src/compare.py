@@ -2,7 +2,7 @@
 #cython: language_level=3
 
 from operator import itemgetter
-from card import make_deck, suits, values
+from cards import make_deck, values
 from validation import validators
 
 # comparison functions
@@ -256,30 +256,17 @@ ranked_cmp_functions = [
     high_card_cmp
 ]
 
-ranked_validators = [
-    validators["royal flush"],
-    validators["straight flush"],
-    validators["four of a kind"],
-    validators["full house"],
-    validators["flush"],
-    validators["straight"],
-    validators["three of a kind"],
-    validators["two pair"],
-    validators["pair"],
-    validators["high card"]
-]
-
 def hand_cmp(hand1, hand2):
     rank1 = 0
     rank2 = 0
 
-    for i in range(len(ranked_validators)):
-        if ranked_validators[i](hand1):
+    for i in range(len(validators)):
+        if validators[i](hand1):
             rank1 = i
             break
     
-    for i in range(len(ranked_validators)):
-        if ranked_validators[i](hand2):
+    for i in range(len(validators)):
+        if validators[i](hand2):
             rank2 = i
             break
 
@@ -294,7 +281,7 @@ def hand_cmp(hand1, hand2):
             return 0
 
 if __name__ == '__main__':
-    from card import combinations, hand_tostring
+    from cards import combinations, hand_tostring
     import functools, sys
 
     hands = []
@@ -302,7 +289,7 @@ if __name__ == '__main__':
     test = 0
     if len(sys.argv) > 1:
         test = int(sys.argv[1])
-    validator = ranked_validators[test]
+    validator = validators[test]
 
     for hand in combinations(deck, 5):
         if validator(hand):

@@ -1,23 +1,10 @@
 #!/usr/bin/python3
 #cython: language_level=3
 
-import json
+import functools
 from operator import itemgetter
-
-from importlib_metadata import functools
-from card import string_tohand, suits, values
-from compare import flush_cmp, number_of_a_kind_cmp, ranked_cmp_functions
-
-def load_rank_table(path):
-    f = open(path, 'r')
-    rank_table_unset = json.load(f)
-    f.close()
-    rank_table = {}
-
-    for hand_string in rank_table_unset:
-        rank_table[frozenset(string_tohand(hand_string))] = rank_table_unset[hand_string]
-
-    return rank_table
+from compare import flush_cmp, ranked_cmp_functions
+from cards import suits, values
 
 def best_hand_high_card(input_hand):
     hand = list(input_hand)

@@ -1,5 +1,5 @@
 # Custom
-ranks.json
+*.json
 *.c
 
 # Byte-compiled / optimized / DLL files
