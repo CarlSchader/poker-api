@@ -2,44 +2,12 @@
 #cython: language_level=3
 
 import math, functools
+from utils import sort_dict, dict_cmp
 from cards import hand_tostring, hand_names, make_deck, combinations
-from compare import ranked_cmp_functions
 from validation import validators
 from ranks import best_hand_functions
 from tables import load_table, write_array, write_table
 from simulator import simulate_hand
-
-def generate_ranks(path):
-    ranked_hands = [[] for _ in range(len(validators))]
-    deck = make_deck()
-    count = 0
-    total = math.comb(len(deck), 5)
-    for hand in combinations(deck, 5):
-        for i in range(len(validators)):
-            if validators[i](hand):
-                ranked_hands[i].append(hand)
-                break
-        count += 1
-        print('\t% ' + str(int(100 * (count / total))), end="\r")
-    
-    f = open(path, 'w')
-    f.write('{\n')
-
-    rank = total
-    found = 0
-    for i in range(len(ranked_hands)):
-        ranked_hands[i].sort(key=functools.cmp_to_key(ranked_cmp_functions[i]), reverse=True)
-        found += len(ranked_hands[i])
-        print("\nsorted", i)
-        for j in range(len(ranked_hands[i])):
-            if i == len(ranked_hands) - 1 and j == len(ranked_hands[i]) - 1:
-                f.write('\t"{}": {} \n'.format(hand_tostring(ranked_hands[i][j]), rank))
-            else:
-                f.write('\t"{}": {},\n'.format(hand_tostring(ranked_hands[i][j]), rank))
-            rank -= 1
-
-    f.write('}')
-    f.close()
 
 def holdem_thread(hand, rank_table, holdem_data, total_possible_hands):
     deck = make_deck(set(hand))
@@ -81,31 +49,13 @@ def generate_holdem_data(path, hand_size, batch_size):
             holdem_table[hand_set] = simulate_hand(hand, 7, rank_table)
             if hand_count % batch_size == 0 or hand_count == hand_combs:
                 write_table(holdem_table, path)
-        
-
-def sort_dict(dictionary, cmp_func):
-    arr = []
-    for key in dictionary:
-        arr.append((key, dictionary[key]))
-    
-    arr.sort(key=functools.cmp_to_key(lambda x, y : cmp_func(x[1], y[1])))
-    return arr
-
-
-def dict_cmp(key, x, y):
-    if x[key] > y[key]:
-        return 1
-    elif x[key] < y[key]:
-        return -1
-    else:
-        return 0
 
 def generate_sorted_file(inpath, outpath, sort_key='expected_rank'):
     print('loading table')
     dictionary = load_table(inpath)
     
     print('sorting entries')
-    sorted_array = sort_dict(dictionary, lambda x, y : dict_cmp(sort_key, x, y))
+    sorted_array = sort_dict(dictionary, lambda x, y : dict_cmp(x, y, sort_key))
 
     print('writing array')
     write_array(sorted_array, outpath)

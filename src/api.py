@@ -1,16 +1,15 @@
-import os
+import os, signal
 from flask import Flask, request
-import redis
-from simulator import simulate_hand
+from simulator import createRanks, simulate_hand_redis
 from tables import load_table
-from cards import value_map
+from cards import hand_tostring, value_map
+
+signal.signal(signal.SIGTERM, lambda _ : exit(0))
 
 SUITS = {'d': 'd', 'h': 'h', 's': 's', 'c': 'c'}
+PORT = os.environ['PORT']
 RANK_TABLE_PATH = os.environ['RANK_TABLE_PATH']
-REDIS_HOST = os.environ['REDIS_HOST']
-REDIS_PORT = os.environ['REDIS_PORT']
 
-redic_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, charset='utf-8', decode_responses=True)
 app = Flask(__name__)
 
 print('loading rank table')
@@ -19,19 +18,16 @@ if RANK_TABLE_PATH == None:
     exit(1)
 else:
     rank_table = load_table(RANK_TABLE_PATH)
+    print(len(rank_table), 'entries')
 
 def convertHandParam(handParam, sep='-'):
     return tuple([(value_map[card[:-1].upper()], SUITS.get(card[-1].lower(), 'h')) for card in handParam.split(sep)])
-
-def serializeHand(hand, count):
-    sorted_hand = [str(card[0]) + card[1] for card in hand]
-    sorted_hand.sort()
-    return str(count) + ':' + '-'.join(sorted_hand)
 
 @app.route('/')
 def simulate():
     hand = request.args.get('hand')
     count = request.args.get('count')
+    shared = request.args.get('shared')
 
     if hand:
         hand = convertHandParam(hand)
@@ -41,16 +37,26 @@ def simulate():
         count = 7
     else:
         count = int(count)
+    if shared:
+        shared = convertHandParam(shared)
+    else:
+        shared = tuple()
+
+    results = {}
+    results['probabilities'] = simulate_hand_redis(hand + shared, count, rank_table)
     
-    serialized_hand = serializeHand(hand, count)
+    if len(shared) > 0:
+        ranks = createRanks(shared, len(shared) + len(hand), count, rank_table)
+        rank = int(ranks[frozenset(hand + shared)])
+        results['pocket_ranking'] = {'rank': rank, 'total': len(ranks), 'percentile': 100 * (rank / len(ranks))}
+        results['pocket_ranking']['note'] = 'This ranking takes into account the cards on the table'
 
-    response = redic_client.hgetall(serialized_hand)
-    if not response:
-        response = simulate_hand(hand, count, rank_table)
-        redic_client.hset(serialized_hand, mapping=response)
+    results['pocket'] = hand_tostring(hand)
+    results['table'] = hand_tostring(shared)
 
-    response['hand'] = serialized_hand
-    return response
+
+
+    return results
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=PORT)

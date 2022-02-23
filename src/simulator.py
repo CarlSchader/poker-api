@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 #cython: language_level=3
 
-import math
-from cards import hand_tostring, make_deck, combinations, hand_names, value_map
+import math, functools
+from cards import hand_tostring, make_deck, combinations, hand_names, serializeHand, value_map
 from ranks import best_hand_functions
 from compare import validators
 from tables import load_array_as_dict, load_table
+from redis_client import client as redis
+from utils import dict_cmp
 
 def simulate_hand(hand, end_hand_size, rank_table, exclude=set()):
     hand_size = len(hand)
@@ -13,7 +15,10 @@ def simulate_hand(hand, end_hand_size, rank_table, exclude=set()):
     count = 0
     total_rank = 0
     outcomes = {name: 0 for name in hand_names}
-    total_possible_hands = math.comb(52 - hand_size, end_hand_size - hand_size)
+    
+    total_possible_hands = 1
+    if end_hand_size - hand_size > 0:
+        total_possible_hands = math.comb(52 - hand_size, end_hand_size - hand_size)
 
     for comb in combinations(deck, end_hand_size - hand_size):
         count += 1
@@ -28,6 +33,32 @@ def simulate_hand(hand, end_hand_size, rank_table, exclude=set()):
         hand_data[outcome] = outcomes[outcome] / total_possible_hands
     return hand_data
 
+def simulate_hand_redis(hand, end_hand_size, rank_table, exclude=set()):
+    serializedHand = serializeHand(hand, end_hand_size)
+    results = redis.hgetall(serializedHand)
+    
+    if not results:
+        results = simulate_hand(hand, end_hand_size, rank_table, exclude=set())
+        redis.hset(serializedHand, mapping=results)
+    
+    return results
+
+def createRanks(hand, current_hand_size, end_hand_size, rank_table, exclude=set()):
+    deck = make_deck(set(tuple(hand) + tuple(exclude)))
+    rank_array = []
+    for comb in combinations(deck, current_hand_size - len(hand)):
+        result = simulate_hand_redis(tuple(hand + comb), end_hand_size, rank_table)
+        result['hand'] = frozenset(tuple(hand + comb))
+        rank_array.append(result)
+    
+    rank_array.sort(key=functools.cmp_to_key(lambda x, y : dict_cmp(x, y, 'expected_rank')))
+    rank_table = {}
+
+    for i in range(len(rank_array)):
+        result = rank_array[i]
+        rank_table[result['hand']] = i
+    
+    return rank_table
 
 if __name__ == '__main__':
     import sys

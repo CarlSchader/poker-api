@@ -20,6 +20,11 @@ hand_names = [
 
 # printing functions
 
+def serializeHand(hand, count):
+    sorted_hand = [str(card[0]) + card[1] for card in hand]
+    sorted_hand.sort()
+    return str(count) + ':' + '-'.join(sorted_hand)
+
 def val_tostring(val):
     return values[(val - 1) % 13]
 
@@ -31,6 +36,8 @@ def card_tostring(card):
 
 def hand_tostring(hand):
     string = ""
+    if len(hand) == 0:
+        return string
     for i in range(len(hand) - 1):
         string += card_tostring(hand[i]) + ' '
     return string + card_tostring(hand[len(hand) - 1])
@@ -88,6 +95,10 @@ def combinations(container, number):
     final_indices = [i for i in range(size - number, size)]
     done = False
     
+    if number == 0:
+        yield tuple()
+        done = True
+
     while not done:
         yield tuple([container_tuple[indices[i]] for i in range(number)])
 
