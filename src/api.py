@@ -1,5 +1,5 @@
 import os, signal
-from flask import Flask, request
+from flask import Flask, request, Response
 from simulator import createRanks, simulate_hand_redis
 from tables import load_table
 from cards import hand_tostring, value_map
@@ -54,9 +54,11 @@ def simulate():
     results['pocket'] = hand_tostring(hand)
     results['table'] = hand_tostring(shared)
 
-
-
     return results
+
+@app.route('/health')
+def health_check():
+    return Response(status=200)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=PORT)

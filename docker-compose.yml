@@ -3,9 +3,9 @@ version: "3.5"
 services:
   poker-api:
     build: .
-    # ports:
-    #   - target: 80
-    #     published: 80
+    ports:
+      - target: 80
+        published: 80
     networks:
       - backend
       - poker-frontend
