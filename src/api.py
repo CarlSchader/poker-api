@@ -10,21 +10,20 @@ SUITS = {'d': 'd', 'h': 'h', 's': 's', 'c': 'c'}
 PORT = os.environ['PORT']
 RANK_TABLE_PATH = os.environ['RANK_TABLE_PATH']
 
+print('Loading rank table')
+rank_table = load_table(RANK_TABLE_PATH)
+
 app = Flask(__name__)
 
-print('loading rank table')
 if RANK_TABLE_PATH == None:
     print('RANK_TABLE_PATH environment variable not set')
     exit(1)
-else:
-    rank_table = load_table(RANK_TABLE_PATH)
-    print(len(rank_table), 'entries')
 
 def convertHandParam(handParam, sep='-'):
     return tuple([(value_map[card[:-1].upper()], SUITS.get(card[-1].lower(), 'h')) for card in handParam.split(sep)])
 
 @app.route('/')
-def simulate():
+def simulate():    
     hand = request.args.get('hand')
     count = request.args.get('count')
     shared = request.args.get('shared')
@@ -58,7 +57,10 @@ def simulate():
 
 @app.route('/health')
 def health_check():
+    print("health check")
     return Response(status=200)
 
 if __name__ == '__main__':
+
+    print('Serving on port: {}'.format(PORT))
     app.run(host='0.0.0.0', port=PORT)
