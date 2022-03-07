@@ -20,10 +20,13 @@ hand_names = [
 
 # printing functions
 
-def serializeHand(hand, count):
-    sorted_hand = [str(card[0]) + card[1] for card in hand]
+def serializeHand(hand, prefix=None):
+    sorted_hand = [str(card[0]) + card[1].lower() for card in hand]
     sorted_hand.sort()
-    return str(count) + ':' + '-'.join(sorted_hand)
+    if prefix != None:
+        return str(prefix) + ':' + '-'.join(sorted_hand)
+    else:
+        return '-'.join(sorted_hand)
 
 def val_tostring(val):
     return values[(val - 1) % 13]

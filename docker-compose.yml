@@ -2,12 +2,33 @@ version: "3.5"
 
 services:
   poker-api:
-    build: .
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    depends_on:
+      - redis
     networks:
       - backend
       - poker-frontend
     environment:
-      - PORT=80
+      - PORT=8080
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - target: 8080
+        published: 8080
+
+  populate-redis:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-populate-redis
+    depends_on:
+      - redis
+    networks:
+      - backend
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
   redis:
     image: redis:alpine

@@ -1,5 +1,5 @@
 import functools, math
-from cards import combinations, make_deck, hand_tostring
+from cards import combinations, make_deck, serializeHand
 from validation import validators
 from compare import ranked_cmp_functions
 
@@ -27,9 +27,9 @@ def generate_rank_table(path):
         print("\nsorted", i)
         for j in range(len(ranked_hands[i])):
             if i == len(ranked_hands) - 1 and j == len(ranked_hands[i]) - 1:
-                f.write('\t"{}": {} \n'.format(hand_tostring(ranked_hands[i][j]), rank))
+                f.write('\t"{}": {} \n'.format(serializeHand(ranked_hands[i][j]), rank))
             else:
-                f.write('\t"{}": {},\n'.format(hand_tostring(ranked_hands[i][j]), rank))
+                f.write('\t"{}": {},\n'.format(serializeHand(ranked_hands[i][j]), rank))
             rank -= 1
 
     f.write('}')

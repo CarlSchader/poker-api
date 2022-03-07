@@ -1,29 +1,30 @@
-import os, signal
+import os, signal, redis, math
 from flask import Flask, request, Response
 from simulator import createRanks, simulate_hand_redis
-from tables import load_table
 from cards import hand_tostring, value_map
 
 signal.signal(signal.SIGTERM, lambda _ : exit(0))
 
 SUITS = {'d': 'd', 'h': 'h', 's': 's', 'c': 'c'}
 PORT = os.environ['PORT']
-RANK_TABLE_PATH = os.environ['RANK_TABLE_PATH']
+REDIS_HOST = os.environ['REDIS_HOST']
+REDIS_PORT = os.environ['REDIS_PORT']
 
-print('Loading rank table')
-rank_table = load_table(RANK_TABLE_PATH)
+TOTAL_HANDS = math.comb(52, 5)
+
+client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, charset='utf-8', decode_responses=True)
 
 app = Flask(__name__)
-
-if RANK_TABLE_PATH == None:
-    print('RANK_TABLE_PATH environment variable not set')
-    exit(1)
 
 def convertHandParam(handParam, sep='-'):
     return tuple([(value_map[card[:-1].upper()], SUITS.get(card[-1].lower(), 'h')) for card in handParam.split(sep)])
 
 @app.route('/')
-def simulate():    
+def simulate():
+    dbsize = client.dbsize()
+    if dbsize < TOTAL_HANDS:
+        return {'populating redis': '{} of {}'.format(dbsize, TOTAL_HANDS)}
+
     hand = request.args.get('hand')
     count = request.args.get('count')
     shared = request.args.get('shared')
@@ -42,10 +43,10 @@ def simulate():
         shared = tuple()
 
     results = {}
-    results['probabilities'] = simulate_hand_redis(hand + shared, count, rank_table)
+    results['probabilities'] = simulate_hand_redis(hand + shared, count, client)
     
     if len(shared) > 0:
-        ranks = createRanks(shared, len(shared) + len(hand), count, rank_table)
+        ranks = createRanks(shared, len(shared) + len(hand), count)
         rank = int(ranks[frozenset(hand + shared)])
         results['pocket_ranking'] = {'rank': rank, 'total': len(ranks), 'percentile': 100 * (rank / len(ranks))}
         results['pocket_ranking']['note'] = 'This ranking takes into account the cards on the table'
