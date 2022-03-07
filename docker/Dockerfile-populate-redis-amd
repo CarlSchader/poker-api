@@ -1,0 +1,13 @@
+FROM python@sha256:c6dfa1969b1ded5c39848997216fe4d3274b4e4c2d4f484080d8f4bfc03c7af9
+
+WORKDIR /usr/src/app
+
+COPY src/generate_rank_table.py src/cards.py src/validation.py src/compare.py src/load_rank_table_redis.py requirements.txt ./
+
+RUN pip install --no-cache-dir -r requirements.txt
+RUN python3 generate_rank_table.py ranks.json
+
+ENV REDIS_HOST=redis
+ENV REDIS_PORT=6379
+
+ENTRYPOINT [ "python3", "load_rank_table_redis.py", "ranks.json" ]

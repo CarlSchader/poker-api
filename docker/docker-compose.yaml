@@ -1,9 +1,23 @@
 version: "3.5"
 
 services:
+  poker-web:
+    image: carlschader/poker-web
+    depends_on:
+      - poker-api
+    ports:
+      - target: 80
+        published: 80
+    environment:
+    - PORT=80
+    - API_URL=http://poker-api:8080
+    networks:
+      - backend
+
+
   poker-api:
     build:
-      context: .
+      context: ../
       dockerfile: docker/Dockerfile
     depends_on:
       - redis
@@ -19,7 +33,7 @@ services:
 
   populate-redis:
     build:
-      context: .
+      context: ../
       dockerfile: docker/Dockerfile-populate-redis
     depends_on:
       - redis
@@ -30,12 +44,17 @@ services:
       - REDIS_PORT=6379
 
   redis:
-    image: redis:alpine
+    image: redis
     ports:
       - target: 6379
         published: 6379
     networks:
       - backend
+    volumes:
+      - redis:/data
 
 networks:
   backend:
+
+volumes:
+  redis:
