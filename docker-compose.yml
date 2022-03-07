@@ -9,7 +9,6 @@ services:
       - redis
     networks:
       - backend
-      - poker-frontend
     environment:
       - PORT=8080
       - REDIS_HOST=redis

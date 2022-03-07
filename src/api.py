@@ -46,7 +46,7 @@ def simulate():
     results['probabilities'] = simulate_hand_redis(hand + shared, count, client)
     
     if len(shared) > 0:
-        ranks = createRanks(shared, len(shared) + len(hand), count)
+        ranks = createRanks(shared, len(shared) + len(hand), count, client)
         rank = int(ranks[frozenset(hand + shared)])
         results['pocket_ranking'] = {'rank': rank, 'total': len(ranks), 'percentile': 100 * (rank / len(ranks))}
         results['pocket_ranking']['note'] = 'This ranking takes into account the cards on the table'

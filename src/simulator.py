@@ -48,11 +48,11 @@ def simulate_hand_redis(hand, end_hand_size, client, exclude=set()):
     
     return results
 
-def createRanks(hand, current_hand_size, end_hand_size, exclude=set()):
+def createRanks(hand, current_hand_size, end_hand_size, client, exclude=set()):
     deck = make_deck(set(tuple(hand) + tuple(exclude)))
     rank_array = []
     for comb in combinations(deck, current_hand_size - len(hand)):
-        result = simulate_hand_redis(tuple(hand + comb), end_hand_size)
+        result = simulate_hand_redis(tuple(hand + comb), end_hand_size, client)
         result['hand'] = frozenset(tuple(hand + comb))
         rank_array.append(result)
     
