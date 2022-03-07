@@ -40,5 +40,3 @@ services:
 
 networks:
   backend:
-  poker-frontend:
-    external: true
