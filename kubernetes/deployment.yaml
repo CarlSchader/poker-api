@@ -19,6 +19,8 @@ spec:
         image: carlschader/poker-api-amd:latest
         ports:
         - containerPort: 8080
+          name: http
+          protocol: TCP
         env:
         - name: PORT
           value: "8080"
@@ -26,13 +28,3 @@ spec:
           value: redis.default.svc.cluster.local
         - name: REDIS_PORT
           value: "6379"
-        - name: RANK_TABLE_PATH
-          value: ranks.json
-        # livenessProbe:
-        #   httpGet:
-        #     path: /health
-        #     port: 80
-        #   initialDelaySeconds: 5
-        #   timeoutSeconds: 5
-        #   periodSeconds: 60
-        #   failureThreshold: 3

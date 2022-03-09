@@ -5,6 +5,8 @@ COPY requirements.txt src/ ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+ENV PYTHONUNBUFFERED=0
+
 ENV REDIS_HOST=redis
 ENV REDIS_PORT=6379
 ENV PORT=8080

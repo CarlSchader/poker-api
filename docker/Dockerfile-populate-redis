@@ -2,10 +2,14 @@ FROM python
 
 WORKDIR /usr/src/app
 
-COPY src/generate_rank_table.py src/cards.py src/validation.py src/compare.py src/load_rank_table_redis.py requirements.txt ./
+COPY src/generate_rank_table.py src/cards.py src/validation.py src/compare.py requirements.txt ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 RUN python3 generate_rank_table.py ranks.json
+
+COPY src/load_rank_table_redis.py ./
+
+ENV PYTHONUNBUFFERED=0
 
 ENV REDIS_HOST=redis
 ENV REDIS_PORT=6379
