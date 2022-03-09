@@ -17,12 +17,16 @@ if client.dbsize() >= TOTAL_HANDS:
 
 print('populating redis')
 f = open(sys.argv[1], 'r')
+line_num = 1
 for line in f:
     split_line = line.split(':')
     if len(split_line) == 2:
         index = split_line[0].strip().replace('"', '')
         value = int(split_line[1].strip().replace(',', ''))
         client.set(index, value)
+    if line_num % 100000 == 0:
+        print('{} of {} written'.format(line_num, TOTAL_HANDS))
+    line_num += 1
 print('populating redis finished')
 
 exit(0)

@@ -26,6 +26,7 @@ services:
       - PORT=8080
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - PYTHONUNBUFFERED=1
     ports:
       - target: 8080
         published: 8080
@@ -41,6 +42,7 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - PYTHONUNBUFFERED=1
 
   redis:
     image: redis

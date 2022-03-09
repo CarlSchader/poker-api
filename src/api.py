@@ -1,5 +1,6 @@
 import os, signal, redis, math
 from flask import Flask, request, Response
+from waitress import serve
 from simulator import createRanks, simulate_hand_redis
 from cards import hand_tostring, value_map
 
@@ -67,4 +68,4 @@ def health_check():
 if __name__ == '__main__':
 
     print('Serving on port: {}'.format(PORT))
-    app.run(host='0.0.0.0', port=PORT)
+    serve(app, host='0.0.0.0', port=PORT)

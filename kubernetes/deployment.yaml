@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: poker-api
-        image: carlschader/poker-api-amd:latest
+        image: carlschader/poker-api:latest
         ports:
         - containerPort: 8080
           name: http
