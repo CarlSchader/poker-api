@@ -21,7 +21,7 @@ def convertHandParam(handParam, sep='-'):
 
 @app.route('/')
 def simulate():
-    print('Request to /:', request.args)
+    print('Request to /', request.args)
     dbsize = client.dbsize()
     if dbsize < TOTAL_HANDS:
         print({'populating redis': '{} of {}'.format(dbsize, TOTAL_HANDS)})
@@ -56,7 +56,7 @@ def simulate():
     results['pocket'] = hand_tostring(hand)
     results['table'] = hand_tostring(shared)
 
-    print(results)
+    print('response body:', results)
     return results
 
 @app.route('/health')

@@ -15,7 +15,7 @@ if client.dbsize() >= TOTAL_HANDS:
     print('db already populated')
     exit(0)
 
-print('populating')
+print('populating redis')
 f = open(sys.argv[1], 'r')
 for line in f:
     split_line = line.split(':')
@@ -23,6 +23,6 @@ for line in f:
         index = split_line[0].strip().replace('"', '')
         value = int(split_line[1].strip().replace(',', ''))
         client.set(index, value)
-print('populating finished')
+print('populating redis finished')
 
 exit(0)
