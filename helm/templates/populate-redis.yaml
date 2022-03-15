@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: poker-populate-redis
+spec:
+  template:
+    spec:
+      containers:
+      - name: poker-populate-redis
+        image: carlschader/poker-populate-redis:latest
+        env:
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: poker-api
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: poker-api
+              key: REDIS_PORT
+        - name: PYTHONUNBUFFERED
+          valueFrom:
+            configMapKeyRef:
+              name: poker-api
+              key: PYTHONUNBUFFERED
+      restartPolicy: OnFailure
+  backoffLimit: 4

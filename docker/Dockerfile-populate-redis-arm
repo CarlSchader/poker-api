@@ -9,7 +9,7 @@ RUN python3 generate_rank_table.py ranks.json
 
 COPY src/load_rank_table_redis.py ./
 
-ENV PYTHONUNBUFFERED=0
+ENV PYTHONUNBUFFERED=1
 
 ENV REDIS_HOST=redis
 ENV REDIS_PORT=6379

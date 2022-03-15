@@ -23,7 +23,7 @@ publish:
 	--amend ${USERNAME}/poker-api:arm \
 	--amend ${USERNAME}/poker-api:amd \
 
-	docker manifest push ${USERNAME}/poker-api:latest
+	docker manifest push --purge ${USERNAME}/poker-api:latest
 
 publish-populate-redis:
 	docker login
@@ -39,7 +39,7 @@ publish-populate-redis:
 	--amend ${USERNAME}/poker-populate-redis:arm \
 	--amend ${USERNAME}/poker-populate-redis:amd \
 
-	docker manifest push ${USERNAME}/poker-populate-redis:latest
+	docker manifest push --purge ${USERNAME}/poker-populate-redis:latest
 
 publish-all:
 	docker login
@@ -55,7 +55,7 @@ publish-all:
 	--amend ${USERNAME}/poker-api:arm \
 	--amend ${USERNAME}/poker-api:amd \
 
-	docker manifest push ${USERNAME}/poker-api:latest
+	docker manifest push --purge ${USERNAME}/poker-api:latest
 
 	docker build -t ${USERNAME}/poker-populate-redis:arm -f docker/Dockerfile-populate-redis-arm .
 	docker build -t ${USERNAME}/poker-populate-redis:amd -f docker/Dockerfile-populate-redis-amd .
@@ -68,4 +68,4 @@ publish-all:
 	--amend ${USERNAME}/poker-populate-redis:arm \
 	--amend ${USERNAME}/poker-populate-redis:amd \
 
-	docker manifest push ${USERNAME}/poker-populate-redis:latest
+	docker manifest push --purge ${USERNAME}/poker-populate-redis:latest

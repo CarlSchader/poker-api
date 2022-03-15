@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poker-api
+  labels:
+    app: poker-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poker-api
+  template:
+    metadata:
+      labels:
+        app: poker-api
+    spec:
+      containers:
+      - name: poker-api
+        image: carlschader/poker-api:latest
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        env:
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: poker-api
+              key: PORT
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: poker-api
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: poker-api
+              key: REDIS_PORT
+        - name: PYTHONUNBUFFERED
+          valueFrom:
+            configMapKeyRef:
+              name: poker-api
+              key: PYTHONUNBUFFERED
